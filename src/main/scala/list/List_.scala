@@ -32,20 +32,6 @@ class List_ extends IList {
     }
   }
 
-  def toArray(): Array[Any] ={
-    val arr = new Array[Any](size)
-    for(i <- 0 to size-1){
-      arr(i) = this.get(i)
-    }
-    arr
-  }
-
-  def fromArray(arr: Array[Any]) ={
-    removeAll()
-    for(i <- 0 to arr.length-1){
-      this.add(arr(i))
-    }
-  }
 
   def size: Int = length
 
@@ -99,14 +85,85 @@ class List_ extends IList {
     }
   }
 
-  def sortFunc(xs: Array[Any], comparator: Comparator): Array[Any] = {
-    if (xs.length <= 1) xs
+  def mergeSortFuncStyle(comparator: Comparator, cnt: Int): (List_, Int) = {
+    if (this.length <= 1)
+      (this, cnt)
     else {
-      val pivot = xs(xs.length / 2)
-      Array.concat(
-        sortFunc(xs.filter(comparator.compare(pivot,_)>0),comparator),
-        xs.filter(comparator.compare(pivot,_)==0),
-        sortFunc(xs.filter(comparator.compare(pivot,_)<0),comparator))
+      var cnt_rez = 0
+      val sortedList = new List_
+      var leftList = new List_
+      var rightList = new List_
+      val middle = this.length / 2
+      for (i <- 0 until middle){
+        leftList.add(this.get(i))
+      }
+      for (i <- middle until this.length){
+        rightList.add(this.get(i))
+      }
+      var a = (leftList,cnt)
+      var b = (rightList,cnt)
+      a = leftList.mergeSortFuncStyle(comparator, 0)
+      leftList = a._1
+      cnt_rez = cnt_rez + a._2
+      b = rightList.mergeSortFuncStyle(comparator, 0)
+      rightList = b._1
+      cnt_rez = cnt_rez + b._2
+
+      //Итератор
+      var left = leftList.head
+      var right = rightList.head
+      var leftHead = 0
+      var rightHead = 0
+
+      if (leftList.length == 1 && rightList.length == 1) {
+        if (comparator.compare(left.data.get, right.data.get) > 0) {
+          sortedList.add(right.data.get)
+          cnt_rez = cnt_rez + 1
+          sortedList.add(left.data.get)
+          cnt_rez = cnt_rez + 1
+        }
+        if (comparator.compare(left.data.get, right.data.get) <= 0) {
+          sortedList.add(left.data.get)
+          cnt_rez = cnt_rez + 1
+          sortedList.add(right.data.get)
+          cnt_rez = cnt_rez + 1
+        }
+      }
+      else {
+        while (leftHead < leftList.length && rightHead < rightList.length) {
+          if (left!=null && comparator.compare(left.data.get, right.data.get ) > 0) {
+            sortedList.add(right.data.get)
+            cnt_rez = cnt_rez + 1
+            right = right.next
+            rightHead = rightHead + 1
+          }
+          if (right != null && comparator.compare(left.data.get, right.data.get) <= 0 ) {
+            sortedList.add(left.data.get)
+            cnt_rez = cnt_rez + 1
+            left = left.next
+            leftHead = leftHead + 1
+          }
+        }
+
+        if (rightHead == rightList.length) {
+          while (leftHead < leftList.length) {
+            sortedList.add(left.data.get)
+            cnt_rez = cnt_rez + 1
+            left = left.next
+            leftHead = leftHead + 1
+          }
+        }
+
+        if (leftHead == leftList.length) {
+          while (rightHead < rightList.length) {
+            sortedList.add(right.data.get)
+            cnt_rez = cnt_rez + 1
+            right = right.next
+            rightHead = rightHead + 1
+          }
+        }
+      }
+      (sortedList, cnt_rez)
     }
   }
 

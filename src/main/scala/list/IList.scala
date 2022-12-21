@@ -19,9 +19,5 @@ trait IList {
 
   def sort(comparator: Comparator): Unit
 
-  def sortFunc(xs: Array[Any], comparator: Comparator): Array[Any]
-
-  def fromArray(arr: Array[Any])
-
-  def toArray(): Array[Any]
+  def mergeSortFuncStyle(comparator: Comparator, cnt: Int): (List_, Int)
 }

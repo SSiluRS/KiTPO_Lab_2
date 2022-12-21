@@ -115,7 +115,7 @@ object UI extends JFXApp3 {
 
       sortBtn.onAction = (e: ActionEvent) => {
         if (listElems.getItems.length > 0 && list.size > 0) {
-          list.fromArray(list.sortFunc(list.toArray(), userType.getComparator))
+          list = list.mergeSortFuncStyle(userType.getComparator,0)._1
           listElems.getItems.clear()
           listElems.items
           for (i <- 0 to list.size - 1) {

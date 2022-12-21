@@ -5,25 +5,33 @@ import ui.UISerialisation
 
 object Main {
   private def test(builder: UserTypeBuilder): Unit = {
+
+    System.out.print("Elements count\t|\tCreate count\n");
     var i = 1
     while ( {
       i < 2000
     }) {
-      val n = i * 1000
-      System.out.println("N = " + n)
-      val list = new List_
+      val n = i * 100
+      System.out.print(n+"\t");
+      var list = new List_
       for (j <- 0 until n) {
         list.add(builder.create)
       }
       val start = System.nanoTime
-      try list.sort(builder.getComparator)
+      var a: (List_, Int) = (null, 0)
+      var cnt = 0
+      try {
+        a = list.mergeSortFuncStyle(builder.getComparator, 0)
+        cnt = a._2
+        list = a._1
+      }
       catch {
         case ignored: StackOverflowError =>
           System.err.println("Stack error")
           return
       }
       val end = System.nanoTime
-      System.out.println("Millis elapsed " + (end - start) * 1.0 / 1_000_000)
+      System.out.println(cnt + "\t");
 
       i *= 2
     }
@@ -31,7 +39,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val userTypeList = List("PolarVector", "Double")
+    val userTypeList = List("Double", "PolarVector")
 
 
     for (s <- userTypeList) {
@@ -39,13 +47,13 @@ object Main {
       val userFactory = new UserFactory()
       val builder = userFactory.getBuilder(s)
       test(builder)
-      val list = new List_()
+      var list = new List_()
       for (j <- 0 until 10) {
         list.add(builder.create)
       }
       System.out.println("initial")
       list.forEach(System.out.println)
-      list.fromArray(list.sortFunc(list.toArray(),builder.getComparator))
+      list = list.mergeSortFuncStyle(builder.getComparator,0)._1
       System.out.println("\nafter sort")
       list.forEach(System.out.println)
       list.remove(1)
@@ -65,9 +73,10 @@ object Main {
 
       System.out.println("\nSaved List_:")
       list.forEach(System.out.println)
-      System.out.println("\n\n")
+      System.out.println("\n")
       System.out.println("Loaded List_:")
       list1.forEach(System.out.println)
+      System.out.println("\n")
     }
   }
 }
